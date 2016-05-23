@@ -97,12 +97,12 @@ Example:
 
         //this.log("Pincode:", this.privatekey);
         var privatekey = this.privatekey;
-        //this.log('Localstorage API write: ', this.data);
+        this.log('Localstorage API write: ', this.data);
         var object = this.data;
         var stringifiedobject = JSON.stringify(object);
-        //this.log(stringifiedobject);
+        this.log(stringifiedobject);
         var encrypted = CryptoJS.AES.encrypt(stringifiedobject, privatekey);
-        //this.log('Localstorage API encrypted: ',encrypted.toString());
+        this.log('Localstorage API encrypted: ',encrypted.toString());
         this.encdata = encrypted.toString();
         //lomqtt.send(this.publickey, this.encdata);
         //var peers = this.data.peers;
