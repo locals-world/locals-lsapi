@@ -67,6 +67,10 @@ Example:
       }
     },
 
+    ready: function(){
+      this.log('were ready with lsapi');
+    },
+
     log: function(e){
       if(this.verbose){
         console.log(e);
