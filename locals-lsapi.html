@@ -45,6 +45,10 @@ Example:
 
     properties: {
 
+      verbose: {
+        type: Boolean
+      },
+
       data: {
         type: Object,
         notify: true,
@@ -63,6 +67,12 @@ Example:
       }
     },
 
+    log: function(e){
+      if(this.verbose){
+        console.log(e);
+      }
+    },
+
     _privatekey: function(){
       //console.log(this.privatekey);
     },
@@ -72,9 +82,9 @@ Example:
     },
 
     initEmpty: function(){
-      console.log("Init activated");
+      this.log("Init activated");
       // lomqtt.subscribe('userobject/'+this.publickey, 2, function(e){
-      //   console.log("Init data: ",e);
+      //   this.log("Init data: ",e);
       // });
       var data = { collection: {}, peers: [], godfather: [], lastupdate: Date.now() };
       this.data = data;
@@ -85,21 +95,21 @@ Example:
 
     writeData: function(){
 
-        //console.log("Pincode:", this.privatekey);
+        //this.log("Pincode:", this.privatekey);
         var privatekey = this.privatekey;
-        //console.log('Localstorage API write: ', this.data);
+        //this.log('Localstorage API write: ', this.data);
         var object = this.data;
         var stringifiedobject = JSON.stringify(object);
-        //console.log(stringifiedobject);
+        //this.log(stringifiedobject);
         var encrypted = CryptoJS.AES.encrypt(stringifiedobject, privatekey);
-        //console.log('Localstorage API encrypted: ',encrypted.toString());
+        //this.log('Localstorage API encrypted: ',encrypted.toString());
         this.encdata = encrypted.toString();
         //lomqtt.send(this.publickey, this.encdata);
         //var peers = this.data.peers;
         //this.$.loxmpp.sendgroupMessage(this.publickey, "SYNCUPDATE", null, null, this.encdata);
         // for (var i = peers.length - 1; i >= 0; i--) {
         //   if(peers[i]!=this.deviceid+"@opantwerpen.be"){
-        //     console.log('Save ook bij: ',peers[i]);
+        //     this.log('Save ook bij: ',peers[i]);
         //     this.$.loxmpp.sendMessage(peers[i], "SYNCUPDATE", null, null, this.encdata);
         //   };
         // };
@@ -117,7 +127,7 @@ Example:
           return v;       // return the unchanged property value.
         });
         this.data = data;
-        console.log(JSON.stringify(data));
+        this.log(JSON.stringify(data));
       };
     },
 
