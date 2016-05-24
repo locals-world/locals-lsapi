@@ -90,7 +90,25 @@ Example:
       // lomqtt.subscribe('userobject/'+this.publickey, 2, function(e){
       //   this.log("Init data: ",e);
       // });
-      var data = { collection: {}, peers: [], godfather: [], lastupdate: Date.now() };
+      var data = { 
+        collection: { 
+          localsavatar: {
+            "component": {
+              "name": "locals-avatar",
+              "contract": "0x000"
+            },
+            "data":{
+              "firstname":"Voornaam",
+              "lastname":"Achternaam",
+              "birthplace":"Antwerpen",
+              "birthdate":"01/01/1999"},
+            "config":
+              [[0,0],[0,0],[0,0],[0,"5"],[0,0],[0,0],[0,0],[0,0],[0,0]]} 
+            }, 
+          peers: [], 
+          godfather: [], 
+          lastupdate: Date.now() 
+        };
       this.data = data;
       //this.fire('init-data');
       this.writeData();
