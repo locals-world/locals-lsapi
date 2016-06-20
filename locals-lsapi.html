@@ -25,7 +25,8 @@ Example:
     <iron-localstorage 
       id="localstorage" 
       name="lo-data" value="{{encdata}}" 
-      on-iron-localstorage-load-empty="initEmpty">
+      on-iron-localstorage-load-empty="initEmpty"
+      on-iron-localstorage-load="readData">
     </iron-localstorage>
 
   </template>
@@ -78,6 +79,7 @@ Example:
     },
 
     _privatekey: function(){
+      this.readData();
       //console.log(this.privatekey);
     },
 
@@ -86,37 +88,38 @@ Example:
     },
 
     initEmpty: function(){
-      this.log("Init activated");
-      // lomqtt.subscribe('userobject/'+this.publickey, 2, function(e){
-      //   this.log("Init data: ",e);
-      // });
-      var data = { 
-        collection: { 
-          localsavatar: {
-            "component": {
-              "name": "locals-avatar",
-              "contract": "0x000"
-            },
-            "data":{
-              "firstname":"Voornaam",
-              "lastname":"Achternaam",
-              "birthplace":"Antwerpen",
-              "birthdate":"01/01/1999"},
-            "config":
-              [[0,0],[0,0],[0,0],[0,"5"],[0,0],[0,0],[0,0],[0,0],[0,0]]} 
-            }, 
-          peers: [], 
-          godfather: [], 
-          lastupdate: Date.now() 
-        };
-      this.data = data;
-      //this.fire('init-data');
-      this.writeData();
-      //data written
+      // this.log("Init activated");
+      // // lomqtt.subscribe('userobject/'+this.publickey, 2, function(e){
+      // //   this.log("Init data: ",e);
+      // // });
+      // var data = { 
+      //   collection: { 
+      //     localsavatar: {
+      //       "component": {
+      //         "name": "locals-avatar",
+      //         "contract": "0x000"
+      //       },
+      //       "data":{
+      //         "firstname":"Voornaam",
+      //         "lastname":"Achternaam",
+      //         "birthplace":"Antwerpen",
+      //         "birthdate":"01/01/1999"},
+      //       "config":
+      //         [[0,0],[0,0],[0,0],[0,"5"],[0,0],[0,0],[0,0],[0,0],[0,0]]} 
+      //       }, 
+      //     peers: [], 
+      //     godfather: [], 
+      //     lastupdate: Date.now() 
+      //   };
+      // this.data = data;
+      // //this.fire('init-data');
+      // this.writeData();
+      // //data written
     },
 
     writeData: function(){
         //this.log("Pincode:", this.privatekey);
+        if (this.privatekey){
         var privatekey = this.privatekey;
         this.log('Localstorage API write: ', this.data);
         var object = this.data;
@@ -125,30 +128,31 @@ Example:
         var encrypted = CryptoJS.AES.encrypt(stringifiedobject, privatekey);
         this.log('Localstorage API encrypted: ',encrypted.toString());
         this.encdata = encrypted.toString();
-        //lomqtt.send(this.publickey, this.encdata);
-        //var peers = this.data.peers;
-        //this.$.loxmpp.sendgroupMessage(this.publickey, "SYNCUPDATE", null, null, this.encdata);
-        // for (var i = peers.length - 1; i >= 0; i--) {
-        //   if(peers[i]!=this.deviceid+"@opantwerpen.be"){
-        //     this.log('Save ook bij: ',peers[i]);
-        //     this.$.loxmpp.sendMessage(peers[i], "SYNCUPDATE", null, null, this.encdata);
-        //   };
-        // };
-        this.readData();
+        this.readData(true);
+
+        }
     },
 
-    readData: function(){
-      if(!this.encdata){
-        this.initEmpty();
+    readData: function(nofire){
+      if(!this.encdata || this.privatekey === undefined){
+        //this.initEmpty();
       } else {
         var privatekey = this.privatekey;
         var decrypted = CryptoJS.AES.decrypt(this.encdata, privatekey);
-        var decrtostring = decrypted.toString(CryptoJS.enc.Utf8);
-        var data = JSON.parse(decrtostring, function(k, v) {
-          return v;       // return the unchanged property value.
-        });
-        this.data = data;
-        this.log(JSON.stringify(data));
+        try{
+          var decrtostring = decrypted.toString(CryptoJS.enc.Utf8);
+          var data = JSON.parse(decrtostring, function(k, v) {
+            return v;       // return the unchanged property value.
+          });
+          this.data = data;
+          this.log(JSON.stringify(data));
+          console.log('password correct');
+          if (!nofire) this.fire('correct-password');
+        }catch(e){
+          // If we arrive here - the password was wrong....
+          console.log('password wrong');
+          if (!nofire) this.fire('wrong-password');
+        }
       };
     },
 
@@ -161,7 +165,7 @@ Example:
     },
 
     attached: function(){
-
+      this.privatekey = sessionStorage.getItem("lopassword");
     }
   });
 })();
