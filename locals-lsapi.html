@@ -138,8 +138,9 @@ Example:
         //this.initEmpty();
       } else {
         var privatekey = this.privatekey;
-        var decrypted = CryptoJS.AES.decrypt(this.encdata, privatekey);
+       
         try{
+          var decrypted = CryptoJS.AES.decrypt(this.encdata, privatekey);          
           var decrtostring = decrypted.toString(CryptoJS.enc.Utf8);
           var data = JSON.parse(decrtostring, function(k, v) {
             return v;       // return the unchanged property value.
